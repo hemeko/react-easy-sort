@@ -1,8 +1,9 @@
 import React from 'react'
 
-import { Point } from './types'
+import { Point, PseudoMouseEvent } from './types'
 
-const getMousePoint = (e: MouseEvent | React.MouseEvent): Point => ({
+
+const getMousePoint = (e: PseudoMouseEvent): Point => ({
   x: Number(e.clientX),
   y: Number(e.clientY),
 })
@@ -59,7 +60,7 @@ export const useDrag = ({
   // on non-touch device, we don't call onStart on mouse down but on the first mouse move
   // we do this to let the user clicks on clickable element inside the container
   // this means that the drag gesture actually starts on the fist move
-  const isFirstMoveRef = React.useRef(false)
+  const handleClickStartTimerMoveRef = React.useRef<number | null>(null)
   // see https://twitter.com/ValentinHervieu/status/1324407814970920968
   // we do this so that the parent doesn't have to use `useCallback()` for these callbacks
   const callbacksRef = React.useRef({ onStart, onMove, onEnd })
@@ -94,21 +95,24 @@ export const useDrag = ({
 
   const onMouseMove = React.useCallback(
     (e: MouseEvent) => {
-      // if this is the first move, we trigger the onStart logic
-      if (isFirstMoveRef.current) {
-        isFirstMoveRef.current = false
-        const pointInWindow = getMousePoint(e)
-        const point = getPointInContainer(pointInWindow, containerPositionRef.current)
-        if (callbacksRef.current.onStart) {
-          callbacksRef.current.onStart({ point, pointInWindow })
-        }
-      }
+      onDrag(getMousePoint(e))
       // otherwise, we do the normal move logic
-      else {
-        onDrag(getMousePoint(e))
-      }
     },
     [onDrag]
+  )
+
+  const moveStart = React.useCallback(
+      (e: PseudoMouseEvent) => {
+          const pointInWindow = getMousePoint(e)
+          const point = getPointInContainer(pointInWindow, containerPositionRef.current)
+          // if (Math.sqrt( Math.pow((oldPoint.x - point.x), 2) + Math.pow((oldPoint.y - point.y), 2)) > 50) {
+          //   return;
+          // }
+          if (callbacksRef.current.onStart) {
+            callbacksRef.current.onStart({ point, pointInWindow })
+          }
+      },
+      []
   )
 
   const onTouchMove = React.useCallback(
@@ -130,7 +134,9 @@ export const useDrag = ({
   )
 
   const onMouseUp = React.useCallback(() => {
-    isFirstMoveRef.current = false
+    if (handleClickStartTimerMoveRef.current) {
+      clearTimeout(handleClickStartTimerMoveRef.current)
+    }
     document.removeEventListener('mousemove', onMouseMove)
     document.removeEventListener('mouseup', onMouseUp)
     if (callbacksRef.current.onEnd) {
@@ -163,8 +169,18 @@ export const useDrag = ({
 
       saveContainerPosition()
 
+      const x = e.clientX;
+      const y = e.clientY;
       // mark the next move as being the first one
-      isFirstMoveRef.current = true
+      handleClickStartTimerMoveRef.current = window.setTimeout(
+          () => {
+            moveStart({
+              clientX: x,
+              clientY: y,
+            })
+          },
+          300
+      )
     },
     [onMouseMove, onMouseUp, saveContainerPosition, knobs]
   )
@@ -197,7 +213,7 @@ export const useDrag = ({
       // is not trying to scroll the page
       handleTouchStartTimerRef.current = window.setTimeout(
         () => handleTouchStart(point, pointInWindow),
-        120
+        300
       )
     },
     [handleTouchStart, saveContainerPosition, knobs]
