@@ -213,7 +213,7 @@ export const useDrag = ({
       // is not trying to scroll the page
       handleTouchStartTimerRef.current = window.setTimeout(
         () => handleTouchStart(point, pointInWindow),
-        300
+        120
       )
     },
     [handleTouchStart, saveContainerPosition, knobs]
