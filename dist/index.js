@@ -18,8 +18,11 @@ var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 var findItemIndexAtPosition = function findItemIndexAtPosition(_a, itemsRect, _b) {
   var x = _a.x,
       y = _a.y;
-  var _c = (_b === void 0 ? {} : _b).fallbackToClosest,
-      fallbackToClosest = _c === void 0 ? false : _c;
+
+  var _c = _b === void 0 ? {} : _b,
+      _d = _c.fallbackToClosest,
+      fallbackToClosest = _d === void 0 ? false : _d;
+
   var smallestDistance = 10000;
   var smallestDistanceIndex = -1;
 
@@ -254,7 +257,7 @@ var useDrag = function useDrag(_a) {
 
     handleTouchStartTimerRef.current = window.setTimeout(function () {
       return handleTouchStart(point, pointInWindow);
-    }, 300);
+    }, 120);
   }, [handleTouchStart, saveContainerPosition, knobs]);
   var detectTouchDevice = React__default['default'].useCallback(function () {
     setTouchDevice(true);
@@ -370,7 +373,7 @@ var SortableList = function SortableList(_a) {
       var newX = lockAxis === 'y' ? sourceRect.left : position.x - offset.x;
       var newY = lockAxis === 'x' ? sourceRect.top : position.y - offset.y; // we use `translate3d` to force using the GPU if available
 
-      targetRef.current.style.transform = "translate3d(" + newX + "px, " + newY + "px, 0px)";
+      targetRef.current.style.transform = "translate3d(".concat(newX, "px, ").concat(newY, "px, 0px)");
     }
   };
 
@@ -390,8 +393,8 @@ var SortableList = function SortableList(_a) {
     } // we ensure the copy has the same size than the source element
 
 
-    copy.style.width = sourceRect.width + "px";
-    copy.style.height = sourceRect.height + "px"; // we place the target starting position to the top left of the window
+    copy.style.width = "".concat(sourceRect.width, "px");
+    copy.style.height = "".concat(sourceRect.height, "px"); // we place the target starting position to the top left of the window
     // it will then be moved relatively using `transform: translate3d()`
 
     copy.style.position = 'fixed';
@@ -486,12 +489,12 @@ var SortableList = function SortableList(_a) {
             var translateX = nextItemRects.left - currentItemRect.left;
             var translateY = nextItemRects.top - currentItemRect.top; // we use `translate3d` to force using the GPU if available
 
-            currentItem.style.transform = "translate3d(" + translateX + "px, " + translateY + "px, 0px)";
+            currentItem.style.transform = "translate3d(".concat(translateX, "px, ").concat(translateY, "px, 0px)");
           }
         } // otherwise, the item should be at its original position
         else {
-            currentItem.style.transform = 'translate3d(0,0,0)';
-          } // we want the translation to be animated
+          currentItem.style.transform = 'translate3d(0,0,0)';
+        } // we want the translation to be animated
 
 
         currentItem.style.transitionDuration = '300ms';

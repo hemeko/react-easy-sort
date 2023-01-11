@@ -1,8 +1,8 @@
-export declare type Point = {
+export type Point = {
     x: number;
     y: number;
 };
-export declare type PseudoMouseEvent = {
+export type PseudoMouseEvent = {
     clientX: number;
     clientY: number;
 };

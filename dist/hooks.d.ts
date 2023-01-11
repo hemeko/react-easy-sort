@@ -1,14 +1,14 @@
 import React from 'react';
 import { Point } from './types';
-export declare type OnStartArgs = {
+export type OnStartArgs = {
     point: Point;
     pointInWindow: Point;
 };
-export declare type OnMoveArgs = {
+export type OnMoveArgs = {
     point: Point;
     pointInWindow: Point;
 };
-declare type UseDragProps = {
+type UseDragProps = {
     onStart?: (args: OnStartArgs) => void;
     onMove?: (args: OnMoveArgs) => void;
     onEnd?: () => void;
